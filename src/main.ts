@@ -59,17 +59,17 @@ export class HttpAssist {
                             request.respond({status: 404, body: "<h1>404</h1>"})
                             break
                         }
-                        let response = await i[p](request)
-                        if(response === undefined){
-                            request.respond({status: 503, body: "<h1>503</h1>"})
-                            try{
+                        let response
+                        try{
+                            response = await i[p](request)
+                            if(response === undefined){
+                                request.respond({status: 503, body: "<h1>503</h1>"})
                                 throw Error("Not return value")
-                            }catch(error){
-                                Log.error(error)
                             }
-                            break
+                            request.respond({status: 200, body:response})
+                        }catch(error){
+                            Log.error(error)
                         }
-                        request.respond({status: 200, body:response})
                         break
                     }
                 }
