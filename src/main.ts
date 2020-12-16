@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.80.0/http/server.ts";
 import * as path from "https://deno.land/std@0.80.0/path/mod.ts";
 import getFiles from "https://deno.land/x/getfiles/mod.ts";
 import { setting } from "./type/type.ts"
+import { Log } from "./log.ts"
 export  { ServerRequest } from "https://deno.land/std@0.80.0/http/server.ts";
 
 export class HttpAssist {
@@ -47,7 +48,7 @@ export class HttpAssist {
             this.onReadyFun()
             
             for await (const request of server) {
-                console.log(request.headers.get("host")+"["+request.method+"]",request.headers.get("host"))
+                Log.log(request.headers.get("host")+"["+request.method+"]")
                 let p = request.url.split("?")[0]
                 let l = 0
                 if(p.endsWith("/")) p = p.slice(0,p.length - 1)
@@ -55,7 +56,6 @@ export class HttpAssist {
                     if(p === Object.keys(i)[0]){
                         l++
                         if(! i.method.includes(request.method)){
-                            console.log(request.method,i.method)
                             request.respond({status: 404, body: "<h1>404</h1>"})
                             break
                         }
@@ -65,7 +65,7 @@ export class HttpAssist {
                             try{
                                 throw Error("Not return value")
                             }catch(error){
-                                console.error(error)
+                                Log.error(error)
                             }
                             break
                         }
@@ -98,9 +98,14 @@ export class HttpAssist {
         }
     }
 
-    async addCog(path1:string){
+    async load(path1:string){
         let x = `file:///${path.join(Deno.cwd().split("\\").join("/"),path1)}.ts`;
         (await import(x)).default(this)
+    }
+
+    addCog(cls:any){
+        this.urllist = this.urllist.concat(cls.retroute())
+        this.sort()
     }
 
     addFolder(path1:string){
@@ -110,7 +115,6 @@ export class HttpAssist {
         for(let i = 0;i < files.length;i++){
             let file = files[i].path.split(p)[1]
             if(! file.startsWith("/")) file = "/" + file
-            console.log(file)
             let url:any = {}
             url[file] =async function(){
                 return sendFile(files[i].path)

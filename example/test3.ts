@@ -1,5 +1,5 @@
 import * as ink from 'https://deno.land/x/ink/mod.ts'
-export class Log{
+class Log{
     constructor(){
 
     }
@@ -12,3 +12,4 @@ export class Log{
         ink.terminal.log('<b><blue>[Error]</blue></b>',`<blue>${text}</blue>`)
     }
 }
+Log.log("")
