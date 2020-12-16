@@ -83,7 +83,7 @@ export class HttpAssist {
                     st = 404
                 }
                 
-                Log.log(`<b>[${request.method}] [IP] ${request.headers.get("host")?.split(":")[0]} [URL]</b>${request.url}<b>\t[Status]</b>${st}`)
+                Log.log(`<b>[${request.method}] [IP] <u>${request.headers.get("host")?.split(":")[0]}</u> [URL]</b>${request.url}<b>\t[Status]</b>${st}`)
             }
         }
     }
@@ -93,8 +93,8 @@ export class HttpAssist {
             for(let j = 0;j < i ;j++){
                 if(Object.keys(this.urllist[j])[0].split("/").length < Object.keys(this.urllist[j+1])[0].split("/").length){
                     let l = this.urllist[j]
-                    this.urllist[j]=this.urllist[j+1]
-                    this.urllist[j+1]=l
+                    this.urllist[j] = this.urllist[j+1]
+                    this.urllist[j+1] = l
                 }
             }
         }

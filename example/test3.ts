@@ -12,4 +12,4 @@ class Log{
         ink.terminal.log('<b><blue>[Error]</blue></b>',`<blue>${text}</blue>`)
     }
 }
-Log.log("")
+Log.log("<u>ww</u>")
