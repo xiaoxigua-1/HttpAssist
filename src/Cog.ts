@@ -26,9 +26,10 @@ class Cog{
         let x:Array<any>
         let y =this.coglist
         return function<T extends { new (...args: any[]): {} }>(cog: T) {
+
             if(y[cog.name] === undefined) x = []
             else x = y[cog.name]
-            console.log(y,x)
+            
             return class extends cog {
                 route:Array<any>
                 constructor(...args: any[]){

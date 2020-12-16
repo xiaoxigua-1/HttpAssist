@@ -9,6 +9,6 @@ export class Log{
     }
     
     static log(text:string){
-        ink.terminal.log('<b><blue>[Error]</blue></b>',`<blue>${text}</blue>`)
+        ink.terminal.log('<b><blue>[Console]</blue></b>',`<blue>${text}</blue>`)
     }
 }
