@@ -51,8 +51,9 @@ export class HttpAssist {
                 
                 let p = request.url.split("?")[0]
                 let l = 0
+                let st:number = 200
                 if(p.endsWith("/")) p = p.slice(0,p.length - 1)
-                let st:number
+                
                 for(let i of this.urllist){
                     if(p === Object.keys(i)[0]){
                         l++
@@ -64,8 +65,6 @@ export class HttpAssist {
                         try{
                             response = await i[p](request)
                             if(response === undefined){
-                                request.respond({status: 503, body: "<h1>503</h1>"})
-                                st = 503
                                 throw Error("Not return value")
                             }
                             request.respond({status: 200, body:response})
@@ -79,9 +78,12 @@ export class HttpAssist {
                         break
                     }
                 }
-                if(!l)request.respond({status: 404, body:"<h1>404</h1>"})
-                st = 404
-                Log.log(`<b>[${request.method}] [IP] ${request.headers.get("host")?.split(":")[0]} [URL]</b>${request.url}<b>[Status]</b>${st}`)
+                if(!l){
+                    request.respond({status: 404, body:"<h1>404</h1>"})
+                    st = 404
+                }
+                
+                Log.log(`<b>[${request.method}] [IP] ${request.headers.get("host")?.split(":")[0]} [URL]</b>${request.url}<b>\t[Status]</b>${st}`)
             }
         }
     }
