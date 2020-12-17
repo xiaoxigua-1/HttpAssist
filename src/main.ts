@@ -50,7 +50,7 @@ export default class HttpAssist {
     async run(hostname:string,port:number){
         if((hostname || port) !== undefined){
             const server = serve({ "hostname": hostname, "port": port });
-            this.onReadyFun()
+            this.onReadyFun(hostname,port)
             
             for await (const request of server) {
                 
