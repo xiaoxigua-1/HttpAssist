@@ -1,4 +1,4 @@
-import { HttpAssist, ServerRequest, sendJson, sendFile } from "../src/main.ts"
+import  HttpAssist, { ServerRequest, sendJson, sendFile } from "../mod.ts"
 
 const app = new HttpAssist()
 
@@ -11,6 +11,7 @@ class C {
     @app.route("/")
     async helloWorld(request:ServerRequest){
         console.log("w")
+        app.setStatus(200)
         return "Hello World"
     }
     @app.route("/api/",{method:["GET"]})

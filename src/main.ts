@@ -3,17 +3,18 @@ import * as path from "https://deno.land/std@0.80.0/path/mod.ts";
 import getFiles from "https://deno.land/x/getfiles/mod.ts";
 import { setting } from "./type/type.ts"
 import { Log } from "./log.ts"
+import { sendFile } from "./functions.ts"
 export  { ServerRequest } from "https://deno.land/std@0.80.0/http/server.ts";
 
-export class HttpAssist {
-    public urllist:Array<any>
+export default class HttpAssist {
+    private urllist:Array<any>
     private onReadyFun:Function
-
+    private status:number
 
     constructor(){
         this.urllist=[]
         this.onReadyFun=function(){}
-        
+        this.status = 200
     }
 
     route(url:string,dict:setting = { method:["GET"] }){
@@ -32,6 +33,10 @@ export class HttpAssist {
                 this.urllist.push(g)
                 this.sort()
             }
+    }
+
+    setStatus(status:number){
+        this.status = status
     }
 
     onReady(){
@@ -64,17 +69,16 @@ export class HttpAssist {
                         let response
                         try{
                             response = await i[p](request)
-                            if(response === undefined){
-                                throw Error("Not return value")
-                            }
-                            request.respond({status: 200, body:response})
-                            st = 200
+                            if(response === undefined) throw Error("Not return value")
+                            if(!["string","object"].includes(typeof(response))) throw Error("Return not string or object")
+                            request.respond({status: this.status, body:response})
+                            st = this.status
+                            this.status = 200
                         }catch(error){
                             request.respond({status: 503, body: "<h1>503</h1>"})
                             Log.error(error)
                             st = 503
                         }
-                        
                         break
                     }
                 }
@@ -83,7 +87,8 @@ export class HttpAssist {
                     st = 404
                 }
                 
-                Log.log(`<b>[${request.method}] [IP] <u>${request.headers.get("host")?.split(":")[0]}</u> [URL]</b>${request.url}<b>\t[Status]</b>${st}`)
+                Log.log(`<b>[${request.method}] [IP] <u>${request.headers.get("host")?.split(":")[0]}</u></b>`+
+                `<b> [Status]</b>${st} <b>[URL]</b>${request.url}`)
             }
         }
     }
@@ -119,7 +124,6 @@ export class HttpAssist {
     }
 
     addFolder(path1:string){
-        let i = 0
         let p = (path1.split(/[\/\\]/g)).join("/")
         let files = getFiles(p)
         for(let i = 0;i < files.length;i++){
@@ -133,10 +137,3 @@ export class HttpAssist {
     }
 }
 
-export function sendJson(x:any):string{
-    return JSON.stringify(x)
-}
-
-export function sendFile(path:string){
-    return Deno.readFile(path)
-}
