@@ -87,7 +87,7 @@ export default class HttpAssist {
                     }
                 }
                 if(!l){
-                    request.respond({status: 404, body:"<h1>404</h1>"})
+                    request.respond({status: 404, body:this.error404fun(request)})
                     st = 404
                 }
                 
