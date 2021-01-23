@@ -1,27 +1,31 @@
-import { serve } from "https://deno.land/std@0.80.0/http/server.ts";
+import { serve, ServerRequest } from "https://deno.land/std@0.80.0/http/server.ts";
 import * as path from "https://deno.land/std@0.80.0/path/mod.ts";
 import getFiles from "https://deno.land/x/getfiles/mod.ts";
-import { setting } from "./type/type.ts"
+import { setting, routefun } from "./type/type.ts"
 import { Log } from "./log.ts"
 import { sendFile } from "./functions.ts"
 export  { ServerRequest } from "https://deno.land/std@0.80.0/http/server.ts";
 
 export default class HttpAssist {
     private urllist:Array<any>
-    private onReadyFun:Function
+    private onReadyFun:(hostname:String,port:number) => void
     private status:number
-
+    private error404fun:(req :ServerRequest) => any
     constructor(){
         this.urllist=[]
         this.onReadyFun=function(){}
         this.status = 200
+        this.error404fun = (req : ServerRequest)=>{
+            this.status = 404
+            return "<h1>404</h1>"
+        }
     }
 
     route(url:string,dict:setting = { method:["GET"] }){
         return (
             target:any,
             propertyKey: string,
-            descriptor: PropertyDescriptor)=>{
+            descriptor: routefun)=>{
                 let g:any = {}
                 if( url.endsWith("/")) url = url.slice(0,url.length - 1)
                 g[url]=descriptor.value
@@ -63,7 +67,7 @@ export default class HttpAssist {
                     if(p === Object.keys(i)[0]){
                         l++
                         if(! i.method.includes(request.method)){
-                            request.respond({status: 404, body: "<h1>404</h1>"})
+                            request.respond({status: 404, body: this.error404fun(request)})
                             break
                         }
                         let response
@@ -87,8 +91,8 @@ export default class HttpAssist {
                     st = 404
                 }
                 
-                Log.log(`<b>[${request.method}] [IP] <u>${request.headers.get("host")?.split(":")[0]}</u></b>`+
-                `<b> [Status]</b>${st} <b>[URL]</b>${request.url}`)
+                Log.log(`<b>[${request.method}] [Host] <u>${request.headers.get("host")?.split(":")[0]}</u></b>`+
+                `<b> [Status]</b>${st} <b>[Path]</b>${request.url}`)
             }
         }
     }
@@ -105,6 +109,10 @@ export default class HttpAssist {
         }
     }
 
+    error404(fun:(req:ServerRequest) => void){
+        this.error404fun = fun
+    }
+    
     add<T extends { new (...args: any[]): {} }>(
         constructor: T
         ) {

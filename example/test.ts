@@ -39,4 +39,4 @@ class P{
 
 app.addFolder("../")
 await app.load("test2")
-await app.run("0.0.0.0",8888)
+await app.run("0.0.0.0",80)
